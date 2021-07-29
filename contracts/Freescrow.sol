@@ -29,7 +29,7 @@ contract escrowService is Ownable{
     struct transaction_details{
         State state;
         address payable seller_address;
-        uint256 transaction_value_in_ether;
+        uint256 transaction_value_in_wei;
     }
     mapping(address => transaction_details) transactions;
     
@@ -47,8 +47,6 @@ contract escrowService is Ownable{
     ILendingPoolAddressesProvider private provider;
 
     IWETHGateway private wETHGateway;
-    
-    event Withdraw (uint256 amount);
     
     constructor() public {
 
@@ -74,12 +72,8 @@ contract escrowService is Ownable{
     
     function confirmDelivery() external{
         require(transactions[msg.sender].state == State.AWAITING_DELIVERY, "Cannot confirm delivery");
-        emit Withdraw(uint256(transactions[msg.sender].transaction_value_in_ether));
-        aToken.approve(WETHGatewayAddress, aToken.balanceOf(address(this)));
-        require(aToken.allowance(address(this), WETHGatewayAddress) >= aToken.balanceOf(address(this)), "allowance missing");
-        wETHGateway.withdrawETH(lendingPoolAddress, uint256(transactions[msg.sender].transaction_value_in_ether) , address(this));
-        transactions[msg.sender].seller_address.transfer(transactions[msg.sender].transaction_value_in_ether);
-        contractLiabilities = contractLiabilities - transactions[msg.sender].transaction_value_in_ether;
+        withdrawETH(transactions[msg.sender].transaction_value_in_wei, transactions[msg.sender].seller_address);
+        contractLiabilities = contractLiabilities - transactions[msg.sender].transaction_value_in_wei;
         transactions[msg.sender].state = State.COMPLETE;
         transactions[msg.sender].seller_address = payable(0);
         
@@ -90,40 +84,33 @@ contract escrowService is Ownable{
      return address(this).balance;
     }
     
-    function getAtokenBalance() public view returns(uint256){
-        return aToken.balanceOf(address(this));
+    function getAtokenBalance() public view returns(uint256) {
+        return (aToken.balanceOf(address(this)));
     }
     
     function getTransaction(address fetchAddress) public view returns(uint, address) {
         if (transactions[fetchAddress].state == State.AWAITING_DELIVERY) {
-            return (transactions[fetchAddress].transaction_value_in_ether, transactions[fetchAddress].seller_address);
+            return (transactions[fetchAddress].transaction_value_in_wei, transactions[fetchAddress].seller_address);
         }else{
             return (0, address(0));
         }
     }
     
+
     function depositETH() internal {
         wETHGateway.depositETH{value: msg.value}(lendingPoolAddress, address(this), 0);
     }   
     
-    function withdrawETH(uint256 amount) internal {
-        if (amount > aToken.balanceOf(address(this))){
-            amount = aToken.balanceOf(address(this));
-        }
-        aToken.approve(WETHGatewayAddress, aToken.balanceOf(address(this)));
-        require(aToken.allowance(address(this), WETHGatewayAddress) >= aToken.balanceOf(address(this)), "allowance missing");
-        wETHGateway.withdrawETH(lendingPoolAddress, amount , address(this));
+    function withdrawETH(uint256 amount, address receiveAddress) internal {
+        aToken.approve(WETHGatewayAddress, amount);
+        require(aToken.allowance(address(this), WETHGatewayAddress) == amount, "allowance missing");
+        wETHGateway.withdrawETH(lendingPoolAddress, amount , receiveAddress);
     }
     
     function withdrawProfits() public onlyOwner {
         require(profitAmount() > 0, "No profits to withdraw");
-        aToken.approve(WETHGatewayAddress, aToken.balanceOf(address(this)));
-        require(aToken.allowance(address(this), WETHGatewayAddress) >= aToken.balanceOf(address(this)), "allowance missing");
         uint256 profit = profitAmount();
-        if (profit > aToken.balanceOf(address(this))){
-            profit = aToken.balanceOf(address(this));
-        }
-        wETHGateway.withdrawETH(lendingPoolAddress, uint256(profit) , msg.sender);
+        withdrawETH(profit, msg.sender);
     }
     
     function profitAmount() public view returns(uint256) {
