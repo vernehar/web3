@@ -1,14 +1,34 @@
 <!DOCTYPE html>
+<script src=
+"https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js">
+    </script>
 <script src="web3.min.js"></script>
 <script src="utils/escrow.js"></script>
+
 <a href="index.html">Main page</a><br>
-<head>****** Escrow service (Ropsten testnet) ******</head>
+<head>****** Escrow service (Kovan testnet) ******</head>
+<br>
+<p id=networkInfo></p>
 <br>
 <button id="enableEthereumButton">Connect wallet</button>
 <br>
 <br>
-<input id="seller"> input seller address<br>
-<input id="value">Eth<br>
-<button id="transact">Escrow</button>
+<input id="seller">  input seller address<br>
+<input id="value">  Eth amount<br>
+<button id="transact">  Make transaction</button><br><br><br>
+
+********************************************<br>
+Confirm transaction
+<button id="confirmTransaction">  Confirm transaction</button><br>
+<p id="confirmation"></p><br><br><br>
+
+********************************************<br>
+Check pending trasnactions for address. Input address or leave empty to check for connected wallet.
+<input id="checkTransactionForThisAddress"><button id="checkTransaction">Check transactions</button><br>
+<p id="accountTransactions"></p><br><br><br>
+
+********************************************
+<p></p><br>
+<button id="claimProfits">Claim contract profits</button>
 
 </html>

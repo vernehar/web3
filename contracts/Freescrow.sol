@@ -48,6 +48,8 @@ contract escrowService is Ownable{
 
     IWETHGateway private wETHGateway;
     
+    event Withdraw (uint256 amount);
+    
     constructor() public {
 
         provider = ILendingPoolAddressesProvider(lpAddressProviderAddress);
@@ -72,7 +74,10 @@ contract escrowService is Ownable{
     
     function confirmDelivery() external{
         require(transactions[msg.sender].state == State.AWAITING_DELIVERY, "Cannot confirm delivery");
-        withdrawETH(transactions[msg.sender].transaction_value_in_ether);
+        emit Withdraw(uint256(transactions[msg.sender].transaction_value_in_ether));
+        aToken.approve(WETHGatewayAddress, aToken.balanceOf(address(this)));
+        require(aToken.allowance(address(this), WETHGatewayAddress) >= aToken.balanceOf(address(this)), "allowance missing");
+        wETHGateway.withdrawETH(lendingPoolAddress, uint256(transactions[msg.sender].transaction_value_in_ether) , address(this));
         transactions[msg.sender].seller_address.transfer(transactions[msg.sender].transaction_value_in_ether);
         contractLiabilities = contractLiabilities - transactions[msg.sender].transaction_value_in_ether;
         transactions[msg.sender].state = State.COMPLETE;
@@ -118,11 +123,11 @@ contract escrowService is Ownable{
         if (profit > aToken.balanceOf(address(this))){
             profit = aToken.balanceOf(address(this));
         }
-        wETHGateway.withdrawETH(lendingPoolAddress, profit , msg.sender);
+        wETHGateway.withdrawETH(lendingPoolAddress, uint256(profit) , msg.sender);
     }
     
     function profitAmount() public view returns(uint256) {
-        return uint256((aToken.balanceOf(address(this)) - contractLiabilities));
+        return uint256(aToken.balanceOf(address(this)) - contractLiabilities);
     }
     
     receive() external payable{
