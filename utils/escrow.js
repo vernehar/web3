@@ -5,12 +5,6 @@ window.onload = function() {
 
     document.getElementById('enableEthereumButton').addEventListener('click', function(){
         getAccount();
-        contractOwner = getContractOwner()
-        if (contractOwner == accounts[0]){
-            document.getElementById('claimProfits').style.visibility = "visible"
-        }else{
-            document.getElementById('claimProfits').style.visibility = "hidden"
-        }
 });
 
     document.getElementById('transact').addEventListener('click', function(){
@@ -53,6 +47,8 @@ async function getAccount() {
         }else{
             document.getElementById('networkInfo').innerHTML = "Connect to kovan!";
         }
+
+
     })
     console.log(EscrowContract)
     console.log(EscrowContract.methods)
@@ -285,7 +281,7 @@ if (web3 != undefined){
                "type":"receive"
             }
          ]
-    , '0xb3C0a293c8BBF84f1227436BED07359ffaeC0435');
+    , '0x2bA890585D54F1D749348890d27592F1DD5acf50');
 
 
 }

@@ -5,7 +5,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.6.12;
 
-
 import "../ILendingPool.sol";
 
 import "../ILendingPoolAddressesProvider.sol";
@@ -55,8 +54,7 @@ contract escrowService is Ownable{
         lendingPool = ILendingPool(lendingPoolAddress);
         wETHGateway = IWETHGateway(WETHGatewayAddress);
         
- 
-        aToken.approve(address(WETHGatewayAddress), type(uint256).max);
+        aToken.approve(WETHGatewayAddress, type(uint256).max);
     }
 
     
@@ -72,11 +70,10 @@ contract escrowService is Ownable{
     
     function confirmDelivery() external{
         require(transactions[msg.sender].state == State.AWAITING_DELIVERY, "Cannot confirm delivery");
-        withdrawETH(transactions[msg.sender].transaction_value_in_wei, transactions[msg.sender].seller_address);
+        withdrawETH(uint256(transactions[msg.sender].transaction_value_in_wei), transactions[msg.sender].seller_address);
         contractLiabilities = contractLiabilities - transactions[msg.sender].transaction_value_in_wei;
         transactions[msg.sender].state = State.COMPLETE;
         transactions[msg.sender].seller_address = payable(0);
-        
         
     }
     
@@ -96,15 +93,13 @@ contract escrowService is Ownable{
         }
     }
     
-
     function depositETH() internal {
         wETHGateway.depositETH{value: msg.value}(lendingPoolAddress, address(this), 0);
     }   
     
-    function withdrawETH(uint256 amount, address receiveAddress) internal {
-        aToken.approve(WETHGatewayAddress, amount);
-        require(aToken.allowance(address(this), WETHGatewayAddress) == amount, "allowance missing");
-        wETHGateway.withdrawETH(lendingPoolAddress, amount , receiveAddress);
+    function withdrawETH(uint256 amount, address payable receiveAddress) internal {
+        require(aToken.approve(WETHGatewayAddress, type(uint256).max), "Approve failed");
+        wETHGateway.withdrawETH(lendingPoolAddress, uint256(amount) , payable(receiveAddress));
     }
     
     function withdrawProfits() public onlyOwner {
@@ -116,7 +111,7 @@ contract escrowService is Ownable{
     function profitAmount() public view returns(uint256) {
         return uint256(aToken.balanceOf(address(this)) - contractLiabilities);
     }
-    
+ 
     receive() external payable{
        
     }
