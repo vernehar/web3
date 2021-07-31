@@ -29,9 +29,10 @@ window.onload = function() {
 
         getTransaction(addressInput)
 
+
+    })
     document.getElementById('claimProfits').addEventListener('click',function(){
         claimProfits()
-    })
 });
 
 }
@@ -56,8 +57,11 @@ async function getAccount() {
 
 async function getTransaction(addressInput) {
     const confirmResult =  await EscrowContract.methods.getTransaction(addressInput).call({from: accounts[0]})
-    
-    message = "Account has a pending transaction, value " + web3.utils.fromWei(confirmResult[0], "ether") + " to "+ confirmResult[1]
+    if (web3.utils.fromWei(confirmResult[0], "ether") != 0) {
+        message = "Account has a pending transaction, value " + web3.utils.fromWei(confirmResult[0], "ether") + " to "+ confirmResult[1]
+    }else{
+        message = "No pending transactions!"
+    }
     document.getElementById("accountTransactions").innerHTML = message
 }
 
@@ -67,7 +71,15 @@ async function getContractOwner() {
 }
 
 async function claimProfits() {
-    EscrowContract.methods.withdrawProfits().send({from: accounts[0]})
+    await getContractOwner().then(response => {
+        if (response.toLowerCase() == accounts[0]) {
+            EscrowContract.methods.withdrawProfits().send({from: accounts[0]})
+            document.getElementById("ProfitWithdrawal").innerHTML = ""
+        }else {
+            document.getElementById("ProfitWithdrawal").innerHTML = "Only contract owner can withdraw profits"
+        }
+    })
+
 }
 
 if (web3 != undefined){
