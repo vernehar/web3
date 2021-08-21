@@ -6,13 +6,13 @@ let fundingCycles = "0xf507B2A1dD7439201eb07F11E1d62AfB29216e2E"
 let terminalV1 = "0xd569D3CCE55b71a8a3f3C418c329A66e5f714431"
 let nounSupply = 0;
 let nounsDaoTreasurySize = 0;
-let sharkTokenSupply
+let sharkTokenTotalSupply
 let fundingCycleWeight
 let overflow
 let sharkDAOEthBalance
 let nounsDAOnounBalance
 let sharkDAOnounBalance
-let loaded = false
+let untappedBalance
 
 var app = new Vue({
     el: '#app',
@@ -3128,9 +3128,9 @@ async function getFundingCycleData(){
     return data
 }
 
-async function getOverFlow(){
-    overflow = await terminalContract.methods.currentOverflowOf(7).call();
-    return overflow
+async function getUntappedBalance(){
+    balance = await terminalContract.methods.balanceOf(7).call();
+    return web3.utils.fromWei(balance, "ether")
 }
 
 async function getSharkDaoNounBalance(){
@@ -3167,14 +3167,17 @@ getFundingCycleData().then(function (result) {
 })
 
 
-getOverFlow().then(function (result){
-    overflow = result
-})
-
 getETHBalance().then(function (result) {
     sharkDAOEthBalance = result
-    app.sharkdaoeth = result
+    getUntappedBalance().then(function (result){
+        app.shardaoeth = parseFloat(app.shardaoeth) + parseFloat(result)
+        sharkDAOEthBalance = parseFloat(sharkDAOEthBalance) + parseFloat(result)
+        app.sharkdaoeth = sharkDAOEthBalance
+
+    })
 });
+
+
 
 getSharkDaoNounBalance().then(function(result){
     sharkDAOnounBalance = result
