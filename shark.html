@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<head>
+    <title>Data about nouns and shark DAO</title>
+</head>
+
+<body>
+    <div id="app">
+      sharkDAO holds {{ sharkdaoeth }} Eth <br>
+      sharkDAO holds {{ sharkdaonouns }} nouns <br>
+      nounsDAO holds {{ nounsdaoeth }} Eth <br>
+      nounsDAO holds {{ nounsdaonouns }} nouns<br>
+      <br>
+      The total supply of nouns is {{nounsupply}} including the one currently for sale<br>
+      The fair valuation of a noun is {{fairprice}} Eth<br>
+      <br>
+      Total supply of shark tokens is {{sharktokensupply}} tokens<br>
+      One eth gets you {{tokensforeth}} shark dao tokens<br>
+      
+
+    </div>
+</body>
+
+
+<script src="web3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="utils/shark_data.js"></script>
+
+
+
+
+<p id="ethdata"></p><br>
+<p id="data"></p><br>
+<p id="noundDaoData"></p>
+<p id="nounFairPrice"></p>
+
+
+
+<br>
+<br>
+<table style="width:40%">
+    <tr>
+      <th>SharkDAO</th>
+      <th>NounsDAO</th>
+    </tr>
+    <tr>
+      <td id="SharkDaoEth"></td>
+      <td id=NounsDaoEth></td>
+    </tr>
+    <tr>
+      <td id="SharkDaoNouns"></td>
+      <td id="NounsDaoNouns"></td>
+    </tr>
+  </table>
+
+
+
+</html>
