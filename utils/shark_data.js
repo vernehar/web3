@@ -25,7 +25,10 @@ var app = new Vue({
         fairprice: 0,
         valuation:0,
         sharktokensupply:0,
-        tokensforeth:0
+        tokensforeth:0,
+        sharkdaonounvaluation:0,
+        message: "",
+        message2: ""
         }
         
     })
@@ -3163,40 +3166,56 @@ getFundingCycleData().then(function (result) {
     app.tokensforeth = result[6]/1e18
 })
 
+
 getOverFlow().then(function (result){
     overflow = result
 })
 
 getETHBalance().then(function (result) {
+    sharkDAOEthBalance = result
     app.sharkdaoeth = result
 });
 
-getSharkDaoNounBalance().then(function (result) {
+getSharkDaoNounBalance().then(function(result){
+    sharkDAOnounBalance = result
     app.sharkdaonouns = result
-});
+    getNounsDaoNounBalance().then(function(result){
+        nounsDAOnounBalance = result
+        app.nounsdaonouns = result
+        getNounSupply().then(function(result){
+            nounSupply = result
+            app.nounsupply = result
+            getNounsDaoEthBalance().then(function(result){
+                nounsDaoTreasurySize = result
+                app.nounsdaoeth = result
+                app.fairprice = nounsDaoTreasurySize/(nounSupply-1-nounsDAOnounBalance)
+                app.sharkdaonounvaluation = calculateValuation()
+            })
+        })
+        })
+        })
+        
 
-getNounsDaoNounBalance().then(function (result) {
-    nounsDAOnounBalance = result;
-    app.nounsdaonouns = result
 
-});
-
-getNounsDaoEthBalance().then(function (result) {
-    nounsDaoTreasurySize = result
-    app.nounsdaoeth = result
-})
-
-getNounSupply().then(function (result) {
-    nounSupply = result
-    app.nounsupply = result
-})
-
-function fairprice(){
-    console.log(nounSupply)
-    return nounsDaoTreasurySize/(nounSupply-1-nounsDAOnounBalance)
+function calculateValuation(){
+    percentageForOneEth = fundingCycleWeight/sharkTokenTotalSupply
+    claimOfDAOEth = percentageForOneEth*sharkDAOEthBalance
+    valuation = (1-claimOfDAOEth)/percentageForOneEth;
+    valuationPerNoun = valuation/sharkDAOnounBalance
+    return valuationPerNoun
 }
 
-app.fairprice = fairprice()
+app.message = "Calculated by:\
+1. dividing shark tokens received per one eth by shark token total supply \
+2. multiplying that by shark dao eth holdings (the amount of eth the shark tokens entitle you to if the eth was paid out) \
+3. taking that number out of one eth (how much of your 1 eth would be left in the dao after payout) \
+4. multiplying result by percentage calculated at step 1 \
+5. multiplying that by amount of nouns that the shark dao holds"
+
+app.message2 = "Calculated by dividing the nouns dao treasury eth amount by noun supply (not taking account the current unsold noun). \
+Possible nounsdao noun holdings are also taken into account and subtracted from the total noun supply"
+
+
 
 
 

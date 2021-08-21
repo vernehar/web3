@@ -1,9 +1,12 @@
 <!DOCTYPE html>
-<head>
+<head style="color: #11ad0e; background-color: #000000;">
     <title>Data about nouns and shark DAO</title>
+    <h>**********Information about nouns, nounsdao and sharkdao*********</h>
 </head>
 
-<body>
+<br>
+<br>
+<body style="font-family: Consolas; color: #11ad0e; background-color: #000000">
     <div id="app">
       sharkDAO holds {{ sharkdaoeth }} Eth <br>
       sharkDAO holds {{ sharkdaonouns }} nouns <br>
@@ -11,11 +14,15 @@
       nounsDAO holds {{ nounsdaonouns }} nouns<br>
       <br>
       The total supply of nouns is {{nounsupply}} including the one currently for sale<br>
-      The fair valuation of a noun is {{fairprice}} Eth<br>
+      <span v-bind:title="message2">
+      The fair valuation of a noun is {{fairprice}} Eth<br></span>
       <br>
       Total supply of shark tokens is {{sharktokensupply}} tokens<br>
       One eth gets you {{tokensforeth}} shark dao tokens<br>
-      
+      <br>
+      <span v-bind:title="message">
+      Implied valuation of shark dao's nouns is {{sharkdaonounvaluation}} eth per noun</span><br><br><br>
+      <p style="font-size: small;">***Hower over data to show how it is calculated***</p>
 
     </div>
 </body>
@@ -28,29 +35,6 @@
 
 
 
-<p id="ethdata"></p><br>
-<p id="data"></p><br>
-<p id="noundDaoData"></p>
-<p id="nounFairPrice"></p>
-
-
-
-<br>
-<br>
-<table style="width:40%">
-    <tr>
-      <th>SharkDAO</th>
-      <th>NounsDAO</th>
-    </tr>
-    <tr>
-      <td id="SharkDaoEth"></td>
-      <td id=NounsDaoEth></td>
-    </tr>
-    <tr>
-      <td id="SharkDaoNouns"></td>
-      <td id="NounsDaoNouns"></td>
-    </tr>
-  </table>
 
 
 
