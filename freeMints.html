@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<script src="web3.min.js"></script>
+<script src="utils/ownerOf.js"></script>
+<head style="color: #11ad0e; background-color: #000000;">
+    <title>Free ID searcher</title>
+    <h>Polls ownerOf function of NFT contracts to see if there are any without owner</h>
+</head>
+<p id=networkInfo></p>
+<br>
+<button id="enableEthereumButton">Connect wallet</button>
+<br>
+<body style="font-family: Consolas; color: #11ad0e; background-color: #000000">
+Search within range (leave empty to search from 1 to 10000)<br>
+From ID <input id="rangeLow"> to <input id="rangeHigh"><br>
+contract address <input id="input"></input><button id="click">search</button>
+<div id="data" style="color: #11ad0e; background-color: #000000;"></div>
+</body>
+</html>
